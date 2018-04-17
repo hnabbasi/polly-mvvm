@@ -17,13 +17,13 @@ In my opinion, the best framework to write MVVM Xamarin.Forms is **Prism.Forms**
 # Components
 These are the main components of the app that make use of **Polly** in a suitable manner possible.
 
-## IHttpClient
+### IHttpClient
 We will use the mono managed `HttpClient` for this demo. But since we can swap the implementation of the client for numerous reasons, I am going to keep the client out of my main service using `IHttpClient` abstraction.
 
-## INetworkService
+### INetworkService
 This service will handle our **Polly** policies. I want to keep all my policies in one place so that I can easily manage them and test them.
 
-## IApiService
+### IApiService
 This service will handle all API calls. We can choose to use **Polly** policies or not in this service. The developer has the freedom to call APIs as he needs because not all calls need a policy e.g. POST that can cause duplications or errors. All my functional services will inject `IApiService` and will provide APIs to make calls.
 
 # Resilience Policies
@@ -32,13 +32,13 @@ For this demo, I will implement `Retry` and `WaitAndRetry` policies. But use the
 # Scope
 **Polly** offers a lot of cool ways to make your app's network resilience awesome. In this demo, I will cover how to use **Polly** in a MVVM-friendly manner that lets you test your service code independently. I will also cover some policies in this demo, and some more in my future demos.
 
-## In This Demo
+### In This Demo
 - Using **Polly** in a service
 - Inject policies service
 - `Retry` policy
 - `WaitAndRetry` policy
 
-## Future Demos
+### Future Demos
 - PolicyRegistry
 - Combined policies
 - Circuit Breaker
