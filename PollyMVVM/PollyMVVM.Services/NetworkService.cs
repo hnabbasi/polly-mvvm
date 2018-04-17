@@ -2,10 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Polly;
+using PollyMVVM.Services.Abstractions;
 
 namespace PollyMVVM.Services
 {
-    public class NetworkService
+    public class NetworkService : INetworkService
     {
         public async Task<T> Retry<T>(Task<T> task)
         {

@@ -9,4 +9,8 @@
     <PackageReference Include="Prism.Unity.Forms" Version="7.0.0.396" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\PollyMVVM.Services\PollyMVVM.Services.csproj" />
+    <ProjectReference Include="..\..\PollyMVVM.Models\PollyMVVM.Models.csproj" />
+  </ItemGroup>
 </Project>

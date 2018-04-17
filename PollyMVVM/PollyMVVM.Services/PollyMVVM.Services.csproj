@@ -9,5 +9,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Polly" Version="5.9.0" />
+    <PackageReference Include="modernhttpclient" Version="2.4.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PollyMVVM.Common\PollyMVVM.Common.csproj" />
+    <ProjectReference Include="..\PollyMVVM.Models\PollyMVVM.Models.csproj" />
   </ItemGroup>
 </Project>

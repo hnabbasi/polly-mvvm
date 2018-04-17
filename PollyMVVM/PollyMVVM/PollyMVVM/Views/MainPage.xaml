@@ -1,6 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="PollyMVVM.Views.MainPage" Title="{Binding Title}">
-    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-        <Label Text="Welcome to Xamarin Forms and Prism!" />
-    </StackLayout>
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             x:Class="PollyMVVM.Views.MainPage" 
+             Title="{Binding Title}"
+             IsBusy="{Binding IsBusy}">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Button Text="Load States" Command="{Binding LoadStatesCommand}"/>
+        <Button Grid.Column="1" Text="Reset" Command="{Binding ClearCommand}"/>
+
+        <ListView Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding States}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding StateName}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <ActivityIndicator IsVisible="{Binding IsBusy}" Grid.Row="1" Grid.ColumnSpan="2"/>
+    </Grid>
 </ContentPage>

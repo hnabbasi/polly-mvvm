@@ -5,6 +5,8 @@ using PollyMVVM.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Prism.Unity;
+using PollyMVVM.Services.Abstractions;
+using PollyMVVM.Services;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace PollyMVVM
@@ -31,6 +33,10 @@ namespace PollyMVVM
         {
             containerRegistry.RegisterForNavigation<NavigationPage>();
             containerRegistry.RegisterForNavigation<MainPage>();
+            containerRegistry.Register<INetworkService, NetworkService>();
+            containerRegistry.Register<IApiService, ApiService>();
+            containerRegistry.Register<IClient, Client>();
+            containerRegistry.Register<IStatesService, StatesService>();
         }
     }
 }
