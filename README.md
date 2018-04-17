@@ -29,5 +29,22 @@ This service will handle our **Polly** policies. I want to keep all my policies 
 ## IApiService
 This service will handle all API calls. We can choose to use **Polly** policies or not in this service. The developer has the freedom to call APIs as he needs because not all calls need a policy e.g. POST that can cause duplications or errors. All my functional services will inject `IApiService` and will provide APIs to make calls.
 
-# Policies
+# Resilience Policies
 For this demo, I will implement `Retry` and `WaitAndRetry` policies. But use these as a starting point and build on top to get more complex policies for your app.
+
+# Scope
+**Polly** offers a lot of cool ways to make your app's network resilience awesome. In this demo, I will cover how to use **Polly** in a MVVM-friendly manner that lets you test your service code independently. I will also cover some policies in this demo, and some more in my future demos.
+
+## In This Demo
+- Using **Polly** in a service
+- Inject policies service
+- `Retry` policy
+- `WaitAndRetry` policy
+
+## Future Demos
+- PolicyRegistry
+- Combined policies
+- Circuit Breaker
+- Cache 
+- Fallback
+
