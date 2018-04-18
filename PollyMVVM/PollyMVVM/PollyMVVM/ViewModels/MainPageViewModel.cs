@@ -1,6 +1,7 @@
 ﻿using PollyMVVM.Services.Abstractions;
 using Prism.Commands;
 using Prism.Navigation;
+using Prism.Services;
 using PollyMVVM.Models;
 using System.Collections.ObjectModel;
 using System;
@@ -11,17 +12,18 @@ namespace PollyMVVM.ViewModels
     public class MainPageViewModel : ViewModelBase
     {
         readonly IStatesService _statesService;
+        private readonly IPageDialogService _pageDialogService;
 
-        public MainPageViewModel(INavigationService navigationService, IStatesService statesService)
+        public MainPageViewModel(INavigationService navigationService, IStatesService statesService, IPageDialogService pageDialogService)
             : base(navigationService)
         {
             Title = "States";
             _statesService = statesService;
-
+            _pageDialogService = pageDialogService;
             InitializeCommands();
         }
 
-		public DelegateCommand LoadStatesCommand { get; private set; }
+        public DelegateCommand LoadStatesCommand { get; private set; }
         public DelegateCommand LoadStatesRetryCommand { get; private set; }
         public DelegateCommand ClearCommand { get; private set; }
 
@@ -66,7 +68,7 @@ namespace PollyMVVM.ViewModels
             }
             catch (Exception ex)
             {
-                ShowAlert((ex.InnerException??ex).Message);
+                ShowAlert((ex.InnerException ?? ex).Message);
             }
         }
 
@@ -84,7 +86,7 @@ namespace PollyMVVM.ViewModels
 
         void ShowAlert(string message)
         {
-            App.Current.MainPage.DisplayAlert("Could Not Get States", message, "OK");
+            _pageDialogService.DisplayAlertAsync("Could Not Get States", message, "OK");
         }
-	}
+    }
 }
