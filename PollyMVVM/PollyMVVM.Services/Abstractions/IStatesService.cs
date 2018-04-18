@@ -8,5 +8,6 @@ namespace PollyMVVM.Services.Abstractions
     public interface IStatesService
     {
         Task<List<State>> GetStates();
+        Task<List<State>> GetStatesWithRetry();
     }
 }

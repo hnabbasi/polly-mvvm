@@ -21,13 +21,20 @@ namespace PollyMVVM.Services
 
         public async Task<T> GetAsync<T>(Uri uri) where T : class
         {
-            return await GetAndRetryInner<T>(uri, 3);
+            return await ProcessGetRequest<T>(uri);
         }
 
-        public Task<T> GetAndRetry<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null, CancellationToken cancelToken = default(CancellationToken)) where T : class
+        public async Task<T> GetAndRetry<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null, CancellationToken cancelToken = default(CancellationToken)) where T : class
         {
-            throw new NotImplementedException();
+            return await _networkService.Retry<T>(ProcessGetRequest<T>(uri), retryCount, onRetry, cancelToken);
         }
+
+        public Task<T> GetWaitAndTry<T>(Uri uri, Func<int, TimeSpan> sleepDurationProvider, int retryCount, Func<Exception, TimeSpan, Task> onWaitAndRetry = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class
+        {
+            return _networkService.WaitAndRetry<T>(ProcessGetRequest<T>(uri), sleepDurationProvider, retryCount, onWaitAndRetry, cancellationToken);
+        }
+
+        #region POST
 
         public Task<T> Post<T>(Uri uri, string json, string contentType = AppConstants.ContentType) where T : class
         {
@@ -39,12 +46,9 @@ namespace PollyMVVM.Services
             throw new NotImplementedException();
         }
 
-        #region Inner Methods
+        #endregion
 
-        internal async Task<T> GetAndRetryInner<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null, CancellationToken cancelToken = default(CancellationToken)) where T : class
-        {
-            return await _networkService.Retry<T>(ProcessGetRequest<T>(uri), retryCount, onRetry, cancelToken);
-        }
+        #region Inner Methods
 
         async Task<T> ProcessGetRequest<T>(Uri uri)
         {
@@ -54,6 +58,8 @@ namespace PollyMVVM.Services
             return JsonConvert.DeserializeObject<T>(rawResponse);
         }
 
+        #region POST
+
         async Task<T> ProcessPostRequest<T>(Uri uri, HttpContent content)
         {
             var response = await _client.Post(uri, content);
@@ -61,6 +67,8 @@ namespace PollyMVVM.Services
             var rawResponse = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(rawResponse);
         }
+
+        #endregion
 
         #endregion
     }

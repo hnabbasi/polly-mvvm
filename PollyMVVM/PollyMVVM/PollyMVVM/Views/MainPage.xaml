@@ -4,6 +4,10 @@
              x:Class="PollyMVVM.Views.MainPage" 
              Title="{Binding Title}"
              IsBusy="{Binding IsBusy}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Name="Reset" Text="Reset" Command="{Binding ClearCommand}" />
+    </ContentPage.ToolbarItems>
     
     <Grid>
         <Grid.RowDefinitions>
@@ -15,8 +19,8 @@
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
-        <Button Text="Load States" Command="{Binding LoadStatesCommand}"/>
-        <Button Grid.Column="1" Text="Reset" Command="{Binding ClearCommand}"/>
+        <Button Text="Try States" Command="{Binding LoadStatesCommand}"/>
+        <Button Text="Load States" Grid.Column="1" Command="{Binding LoadStatesRetryCommand}"/>
 
         <ListView Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding States}">
             <ListView.ItemTemplate>

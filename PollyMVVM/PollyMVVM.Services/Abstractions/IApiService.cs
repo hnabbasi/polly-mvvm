@@ -9,7 +9,11 @@ namespace PollyMVVM.Services.Abstractions
     {
         Task<T> GetAsync<T>(Uri uri) where T : class;
 
-        Task<T> GetAndRetry<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null, CancellationToken cancelToken = default(CancellationToken)) where T : class;
+        Task<T> GetAndRetry<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null, 
+                               CancellationToken cancelToken = default(CancellationToken)) where T : class;
+
+        Task<T> GetWaitAndTry<T>(Uri uri, Func<int, TimeSpan> sleepDurationProvider, int retryCount, Func<Exception, TimeSpan, Task> onWaitAndRetry = null,
+                                 CancellationToken cancellationToken = default(CancellationToken)) where T : class;
 
         Task<T> Post<T>(Uri uri, string json, string contentType = AppConstants.ContentType) where T : class;
 

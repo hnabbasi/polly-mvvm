@@ -22,6 +22,7 @@ namespace PollyMVVM.ViewModels
         }
 
 		public DelegateCommand LoadStatesCommand { get; private set; }
+        public DelegateCommand LoadStatesRetryCommand { get; private set; }
         public DelegateCommand ClearCommand { get; private set; }
 
         ObservableCollection<State> _states;
@@ -34,6 +35,7 @@ namespace PollyMVVM.ViewModels
         void InitializeCommands()
         {
             LoadStatesCommand = new DelegateCommand(OnLoadStatesTapped);
+            LoadStatesRetryCommand = new DelegateCommand(OnLoadStatesRetryTapped);
             ClearCommand = new DelegateCommand(OnClearTapped);
         }
 
@@ -49,10 +51,40 @@ namespace PollyMVVM.ViewModels
             IsBusy = false;
         }
 
+        async void OnLoadStatesRetryTapped()
+        {
+            IsBusy = true;
+            await LoadStatesWithRetry();
+            IsBusy = false;
+        }
+
         async Task LoadStates()
         {
-            await Task.Delay(2000);
-            States = new ObservableCollection<State>(await _statesService.GetStates());
+            try
+            {
+                States = new ObservableCollection<State>(await _statesService.GetStates());
+            }
+            catch (Exception ex)
+            {
+                ShowAlert((ex.InnerException??ex).Message);
+            }
+        }
+
+        async Task LoadStatesWithRetry()
+        {
+            try
+            {
+                States = new ObservableCollection<State>(await _statesService.GetStatesWithRetry());
+            }
+            catch (Exception ex)
+            {
+                ShowAlert((ex.InnerException ?? ex).Message);
+            }
+        }
+
+        void ShowAlert(string message)
+        {
+            App.Current.MainPage.DisplayAlert("Could Not Get States", message, "OK");
         }
 	}
 }
