@@ -26,7 +26,7 @@ namespace PollyMVVM.ViewModels
         public DelegateCommand LoadStatesCommand { get; private set; }
         public DelegateCommand LoadStatesRetryCommand { get; private set; }
         public DelegateCommand ClearCommand { get; private set; }
-
+        
         ObservableCollection<State> _states;
         public ObservableCollection<State> States
         {
@@ -48,16 +48,16 @@ namespace PollyMVVM.ViewModels
 
         async void OnLoadStatesTapped()
         {
-            IsBusy = true;
+            ShowLoading();
             await LoadStates();
-            IsBusy = false;
+            DismissLoading();
         }
 
         async void OnLoadStatesRetryTapped()
         {
-            IsBusy = true;
+            ShowLoading();
             await LoadStatesWithRetry();
-            IsBusy = false;
+            DismissLoading();
         }
 
         async Task LoadStates()

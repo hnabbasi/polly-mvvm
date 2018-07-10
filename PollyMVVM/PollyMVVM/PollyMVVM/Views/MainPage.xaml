@@ -29,7 +29,18 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <StackLayout Grid.Row="1" Grid.ColumnSpan="2" 
+                     HorizontalOptions="Center"
+                     VerticalOptions="Center"
+                     IsVisible="{Binding IsBusy}">
+            <ActivityIndicator IsRunning="{Binding IsBusy}" HorizontalOptions="Center" VerticalOptions="Start"/>
+            <Label Text="{Binding LoadingText}" VerticalTextAlignment="Center"/>
 
-        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Grid.Row="1" Grid.ColumnSpan="2" HorizontalOptions="Center" VerticalOptions="Start"/>
+            <StackLayout.Orientation>
+                <OnPlatform x:TypeArguments="StackOrientation"
+                            iOS="Vertical"
+                            Android="Horizontal"/>
+            </StackLayout.Orientation>
+        </StackLayout>        
     </Grid>
 </ContentPage>

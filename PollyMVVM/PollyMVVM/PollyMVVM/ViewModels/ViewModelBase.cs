@@ -21,6 +21,13 @@ namespace PollyMVVM.ViewModels
             set { SetProperty(ref _isBusy, value); }
         }
 
+        string _loadingText = "Loading...";
+        public string LoadingText
+        {
+            get { return _loadingText; }
+            set { SetProperty(ref _loadingText, value); }
+        }
+
         public ViewModelBase(INavigationService navigationService)
         {
             NavigationService = navigationService;
@@ -44,6 +51,16 @@ namespace PollyMVVM.ViewModels
         public virtual void Destroy()
         {
 
+        }
+
+        protected void ShowLoading(string message = null)
+        {
+            IsBusy = true;
+        }
+
+        protected void DismissLoading()
+        {
+            IsBusy = false;
         }
     }
 }
