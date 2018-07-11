@@ -9,5 +9,6 @@ namespace PollyMVVM.Services.Abstractions
     {
         Task<List<State>> GetStates();
         Task<List<State>> GetStatesWithRetry();
+        Task<List<State>> GetStatesWithWaitAndRetry();
     }
 }

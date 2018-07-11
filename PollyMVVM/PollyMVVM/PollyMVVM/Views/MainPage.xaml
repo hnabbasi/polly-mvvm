@@ -14,33 +14,33 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        
-        <Button Text="Try States" Command="{Binding LoadStatesCommand}"/>
-        <Button Text="Load States" Grid.Column="1" Command="{Binding LoadStatesRetryCommand}"/>
 
-        <ListView Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding States}">
+        <StackLayout>
+            <Button Text="Load States" Command="{Binding LoadStatesCommand}"/>
+            <Button Text="Load States Retry" Command="{Binding LoadStatesRetryCommand}" CommandParameter="false"/>
+            <Button Text="Load States WaitAndRetry" Command="{Binding LoadStatesRetryCommand}" CommandParameter="true"/>
+        </StackLayout>
+        
+        <ListView Grid.Row="1" ItemsSource="{Binding States}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextCell Text="{Binding StateName}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackLayout Grid.Row="1" Grid.ColumnSpan="2" 
+        
+        <StackLayout Grid.Row="1"
                      HorizontalOptions="Center"
-                     VerticalOptions="Center"
+                     VerticalOptions="Start"
                      IsVisible="{Binding IsBusy}">
             <ActivityIndicator IsRunning="{Binding IsBusy}" HorizontalOptions="Center" VerticalOptions="Start"/>
             <Label Text="{Binding LoadingText}" VerticalTextAlignment="Center"/>
 
             <StackLayout.Orientation>
                 <OnPlatform x:TypeArguments="StackOrientation"
-                            iOS="Vertical"
-                            Android="Horizontal"/>
+                            iOS="Horizontal"
+                            Android="Vertical"/>
             </StackLayout.Orientation>
-        </StackLayout>        
+        </StackLayout> 
     </Grid>
 </ContentPage>

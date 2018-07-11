@@ -24,7 +24,7 @@ namespace PollyMVVM.ViewModels
         }
 
         public DelegateCommand LoadStatesCommand { get; private set; }
-        public DelegateCommand LoadStatesRetryCommand { get; private set; }
+        public DelegateCommand<object> LoadStatesRetryCommand { get; private set; }
         public DelegateCommand ClearCommand { get; private set; }
         
         ObservableCollection<State> _states;
@@ -37,7 +37,7 @@ namespace PollyMVVM.ViewModels
         void InitializeCommands()
         {
             LoadStatesCommand = new DelegateCommand(OnLoadStatesTapped);
-            LoadStatesRetryCommand = new DelegateCommand(OnLoadStatesRetryTapped);
+            LoadStatesRetryCommand = new DelegateCommand<object>(OnLoadStatesRetryTapped);
             ClearCommand = new DelegateCommand(OnClearTapped);
         }
 
@@ -53,10 +53,10 @@ namespace PollyMVVM.ViewModels
             DismissLoading();
         }
 
-        async void OnLoadStatesRetryTapped()
+        async void OnLoadStatesRetryTapped(object shouldWaitAndRetry)
         {
             ShowLoading();
-            await LoadStatesWithRetry();
+            await LoadStatesWithRetry(shouldWaitAndRetry.ToString() == "true");
             DismissLoading();
         }
 
@@ -66,27 +66,28 @@ namespace PollyMVVM.ViewModels
             {
                 States = new ObservableCollection<State>(await _statesService.GetStates());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ShowAlert((ex.InnerException ?? ex).Message);
+                ShowAlert("Could Not Load States. Try again later.");
             }
         }
 
-        async Task LoadStatesWithRetry()
+        async Task LoadStatesWithRetry(bool shouldWaitAndRetry)
         {
             try
             {
-                States = new ObservableCollection<State>(await _statesService.GetStatesWithRetry());
+                var getStatesTask = shouldWaitAndRetry ? _statesService.GetStatesWithWaitAndRetry() : _statesService.GetStatesWithRetry();
+                States = new ObservableCollection<State>(await getStatesTask);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ShowAlert((ex.InnerException ?? ex).Message);
+                ShowAlert("Could Not Load States. Try again later.");
             }
         }
 
         void ShowAlert(string message)
         {
-            _pageDialogService.DisplayAlertAsync("Could Not Get States", message, "OK");
+            _pageDialogService.DisplayAlertAsync("Oops...", message, "OK");
         }
     }
 }

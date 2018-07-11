@@ -10,6 +10,7 @@ namespace PollyMVVM.Services
     public class StatesService : IStatesService
     {
         readonly IApiService _apiService;
+        int DEFAULT_COUNT = 3;
 
         public StatesService(IApiService apiService)
         {
@@ -27,41 +28,39 @@ namespace PollyMVVM.Services
         public async Task<List<State>> GetStatesWithRetry()
         {
             var host = new Uri(AppConstants.GetStatesApi);
-
-            var response = await _apiService.GetAndRetry<StatesResponse>(host, 3, OnRetry);
-
+            var response = await _apiService.GetAndRetry<StatesResponse>(host, DEFAULT_COUNT, OnRetry);
             return response.States;
         }
 
         Task OnRetry(Exception e, int retryCount)
         {
             return Task.Factory.StartNew(() => {
-                System.Diagnostics.Debug.WriteLine($"Trying to get states #{retryCount}");
+                System.Diagnostics.Debug.WriteLine($"Retry - Attempt #{retryCount} to get states.");
             });
         }
         #endregion
 
         #region WaitAndRetry
-        //public async Task<List<State>> GetStatesWithRetry()
-        //{
-        //    var host = new Uri(AppConstants.GetStatesApi);
+        public async Task<List<State>> GetStatesWithWaitAndRetry()
+        {
+            var host = new Uri(AppConstants.GetStatesApi);
 
-        //    var response = await _apiService.GetWaitAndTry<StatesResponse>(host, GetSleepDuration /*(i) => { return TimeSpan.FromSeconds(2); }*/, 3, OnWaitAndRetry);
+            var response = await _apiService.GetWaitAndRetry<StatesResponse>(host, GetSleepDuration, DEFAULT_COUNT, OnWaitAndRetry);
 
-        //    return response.States;
-        //}
+            return response.States;
+        }
 
-        //TimeSpan GetSleepDuration(int retryCount)
-        //{
-        //    return TimeSpan.FromSeconds(retryCount * 2);
-        //}
+        TimeSpan GetSleepDuration(int retryCount)
+        {
+            return TimeSpan.FromSeconds(retryCount * 5);
+        }
 
-        //Task OnWaitAndRetry(Exception e, TimeSpan timeSpan)
-        //{
-        //    return Task.Factory.StartNew(() => {
-        //        System.Diagnostics.Debug.WriteLine($"Trying to get states in {timeSpan.ToString("g")}");
-        //    });
-        //}
+        Task OnWaitAndRetry(Exception e, TimeSpan timeSpan)
+        {
+            return Task.Factory.StartNew(() => {
+                System.Diagnostics.Debug.WriteLine($"WaitAndRetry - Trying to get states in {timeSpan.ToString("g")}");
+            });
+        }
         #endregion
 
     }

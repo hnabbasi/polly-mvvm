@@ -14,7 +14,7 @@ namespace PollyMVVM.Services.Abstractions
         Task<T> GetAndRetry<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null, 
                                CancellationToken cancelToken = default(CancellationToken)) where T : class;
 
-        Task<T> GetWaitAndTry<T>(Uri uri, Func<int, TimeSpan> sleepDurationProvider, int retryCount, Func<Exception, TimeSpan, Task> onWaitAndRetry = null,
+        Task<T> GetWaitAndRetry<T>(Uri uri, Func<int, TimeSpan> sleepDurationProvider, int retryCount, Func<Exception, TimeSpan, Task> onWaitAndRetry = null,
                                  CancellationToken cancellationToken = default(CancellationToken)) where T : class;
 
         #endregion

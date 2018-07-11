@@ -6,6 +6,7 @@ namespace PollyMVVM.ViewModels
     public class ViewModelBase : BindableBase, INavigationAware, IDestructible
     {
         protected INavigationService NavigationService { get; private set; }
+        const string DEFAULT_LOADING = "Loading...";
 
         private string _title;
         public string Title
@@ -21,7 +22,7 @@ namespace PollyMVVM.ViewModels
             set { SetProperty(ref _isBusy, value); }
         }
 
-        string _loadingText = "Loading...";
+        string _loadingText = DEFAULT_LOADING;
         public string LoadingText
         {
             get { return _loadingText; }
@@ -33,17 +34,17 @@ namespace PollyMVVM.ViewModels
             NavigationService = navigationService;
         }
 
-        public virtual void OnNavigatedFrom(NavigationParameters parameters)
+        public virtual void OnNavigatedFrom(INavigationParameters parameters)
         {
 
         }
 
-        public virtual void OnNavigatedTo(NavigationParameters parameters)
+        public virtual void OnNavigatedTo(INavigationParameters parameters)
         {
 
         }
 
-        public virtual void OnNavigatingTo(NavigationParameters parameters)
+        public virtual void OnNavigatingTo(INavigationParameters parameters)
         {
 
         }
@@ -56,6 +57,7 @@ namespace PollyMVVM.ViewModels
         protected void ShowLoading(string message = null)
         {
             IsBusy = true;
+            LoadingText = message ?? DEFAULT_LOADING;
         }
 
         protected void DismissLoading()

@@ -25,14 +25,14 @@ namespace PollyMVVM
         protected override async void OnInitialized()
         {
             InitializeComponent();
-
-            await NavigationService.NavigateAsync("NavigationPage/MainPage");
+            await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(MainPage)}");
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<NavigationPage>();
             containerRegistry.RegisterForNavigation<MainPage>();
+
             containerRegistry.Register<INetworkService, NetworkService>();
             containerRegistry.Register<IApiService, ApiService>();
             containerRegistry.Register<IClient, Client>();
