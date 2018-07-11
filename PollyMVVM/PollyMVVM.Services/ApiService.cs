@@ -24,15 +24,16 @@ namespace PollyMVVM.Services
 
         #region With Retries
 
-        public async Task<T> GetAndRetry<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null, CancellationToken cancelToken = default(CancellationToken)) where T : class
+        public async Task<T> GetAndRetry<T>(Uri uri, int retryCount, Func<Exception, int, Task> onRetry = null) where T : class
         {
-            return await _networkService.Retry<T>(ProcessGetRequest<T>(uri), retryCount, onRetry, cancelToken);
+            var func = new Func<Task<T>>(() => ProcessGetRequest<T>(uri));
+            return await _networkService.Retry<T>(func, retryCount, onRetry);
         }
 
-        public async Task<T> GetWaitAndRetry<T>(Uri uri, Func<int, TimeSpan> sleepDurationProvider, int retryCount, Func<Exception, TimeSpan, Task> onWaitAndRetry = null, CancellationToken cancellationToken = default(CancellationToken)) where T : class
+        public async Task<T> GetWaitAndRetry<T>(Uri uri, Func<int, TimeSpan> sleepDurationProvider, int retryCount, Func<Exception, TimeSpan, Task> onWaitAndRetry = null) where T : class
         {
-            var func = new Func<CancellationToken, Task<T>>((ct) => ProcessGetRequest<T>(uri));
-            return await _networkService.WaitAndRetry<T>(func, sleepDurationProvider, retryCount, onWaitAndRetry, cancellationToken);
+            var func = new Func<Task<T>>(() => ProcessGetRequest<T>(uri));
+            return await _networkService.WaitAndRetry<T>(func, sleepDurationProvider, retryCount, onWaitAndRetry);
         }
 
         #endregion

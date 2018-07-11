@@ -8,48 +8,40 @@ namespace PollyMVVM.Services
 {
     public class NetworkService : INetworkService
     {
-        public async Task<T> Retry<T>(Task<T> task)
+        public async Task<T> Retry<T>(Func<Task<T>> func)
         {
-            return await RetryInner(task);
+            return await RetryInner(func);
         }
 
-        public async Task<T> Retry<T>(Task<T> task, int retryCount)
+        public async Task<T> Retry<T>(Func<Task<T>> func, int retryCount)
         {
-            return await RetryInner(task, retryCount);
+            return await RetryInner(func, retryCount);
         }
 
-        public async Task<T> Retry<T>(Task<T> action,
-                                                 int retryCount,
-                                                 Func<Exception, int, Task> onRetry,
-                                                 CancellationToken cancelToken)
+        public async Task<T> Retry<T>(Func<Task<T>> func, int retryCount, Func<Exception, int, Task> onRetry)
         {
-            return await RetryInner(action, retryCount, onRetry, cancelToken);
+            return await RetryInner(func, retryCount, onRetry);
         }
 
-        public async Task<T> WaitAndRetry<T>(Func<CancellationToken, Task<T>> func, Func<int, TimeSpan> sleepDurationProvider)
+        public async Task<T> WaitAndRetry<T>(Func<Task<T>> func, Func<int, TimeSpan> sleepDurationProvider)
         {
             return await WaitAndRetryInner<T>(func, sleepDurationProvider);
         }
 
-        public async Task<T> WaitAndRetry<T>(Func<CancellationToken, Task<T>> func, Func<int, TimeSpan> sleepDurationProvider, int retryCount)
+        public async Task<T> WaitAndRetry<T>(Func<Task<T>> func, Func<int, TimeSpan> sleepDurationProvider, int retryCount)
         {
             return await WaitAndRetryInner<T>(func, sleepDurationProvider, retryCount);
         }
 
-        public async Task<T> WaitAndRetry<T>(Func<CancellationToken, Task<T>> func, Func<int, TimeSpan> sleepDurationProvider, int retryCount,
-                                             Func<Exception, TimeSpan, Task> onRetryAsync, CancellationToken cancelToken)
+        public async Task<T> WaitAndRetry<T>(Func<Task<T>> func, Func<int, TimeSpan> sleepDurationProvider, int retryCount, Func<Exception, TimeSpan, Task> onRetryAsync)
         {
-            return await WaitAndRetryInner<T>(func, sleepDurationProvider, retryCount, onRetryAsync, cancelToken);
+            return await WaitAndRetryInner<T>(func, sleepDurationProvider, retryCount, onRetryAsync);
         }
 
         #region Inner Methods
 
-        internal async Task<T> RetryInner<T>(Task<T> task,
-                                                 int retryCount = 1,
-                                                 Func<Exception, int, Task> onRetry = null,
-                                                 CancellationToken cancelToken = default(CancellationToken))
+        internal async Task<T> RetryInner<T>(Func<Task<T>> func, int retryCount = 1, Func<Exception, int, Task> onRetry = null)
         {
-            var func = new Func<CancellationToken, Task<T>>((t) => task);
             var onRetryInner = new Func<Exception, int, Task>((e, i) =>
             {
                 return Task.Factory.StartNew(() => {
@@ -59,32 +51,10 @@ namespace PollyMVVM.Services
                 });
             });
 
-            return await Policy.Handle<Exception>().RetryAsync(retryCount, onRetry ?? onRetryInner).ExecuteAsync<T>(func, cancelToken);
+            return await Policy.Handle<Exception>().RetryAsync(retryCount, onRetry ?? onRetryInner).ExecuteAsync<T>(func);
         }
 
-        internal async Task<T> WaitAndRetryInner<T>(Task<T> task, Func<int, TimeSpan> sleepDurationProvider,
-                                                    int retryCount = 1,
-                                                    Func<Exception, TimeSpan, Task> onRetryAsync = null,
-                                                    CancellationToken cancelToken = default(CancellationToken))
-        {
-            var func = new Func<CancellationToken, Task<T>>((t) => task);
-            var f = new Func<Task<T>>(() => task);
-            var onRetryInner = new Func<Exception, TimeSpan, Task>((e, t) =>
-            {
-                return Task.Factory.StartNew(() => {
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"Retrying in {t.ToString("g")} due to exception '{(e.InnerException ?? e).Message}'");
-#endif
-                });
-            });
-
-            return await Policy.Handle<Exception>().WaitAndRetryAsync(retryCount, sleepDurationProvider, onRetryAsync ?? onRetryInner).ExecuteAsync<T>(f);
-        }
-
-        internal async Task<T> WaitAndRetryInner<T>(Func<CancellationToken, Task<T>> func, Func<int, TimeSpan> sleepDurationProvider,
-                                                    int retryCount = 1,
-                                                    Func<Exception, TimeSpan, Task> onRetryAsync = null,
-                                                    CancellationToken cancelToken = default(CancellationToken))
+        internal async Task<T> WaitAndRetryInner<T>(Func<Task<T>> func, Func<int, TimeSpan> sleepDurationProvider, int retryCount = 1, Func<Exception, TimeSpan, Task> onRetryAsync = null)
         {
             var onRetryInner = new Func<Exception, TimeSpan, Task>((e, t) =>
             {
@@ -95,9 +65,8 @@ namespace PollyMVVM.Services
                 });
             });
 
-            return await Policy.Handle<Exception>().WaitAndRetryAsync(retryCount, sleepDurationProvider, onRetryAsync ?? onRetryInner).ExecuteAsync<T>(func, cancelToken);
+            return await Policy.Handle<Exception>().WaitAndRetryAsync(retryCount, sleepDurationProvider, onRetryAsync ?? onRetryInner).ExecuteAsync<T>(func);
         }
-
         #endregion
     }
 }
