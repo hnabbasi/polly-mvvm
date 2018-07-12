@@ -1,16 +1,14 @@
-﻿using System;
-
-namespace PollyMVVM.Models
+﻿namespace PollyMVVM.Models
 {
     public class State
     {
-        public string StateCode
+        public string Code
         {
             get;
             set;
         }
 
-        public string StateName
+        public string Name
         {
             get;
             set;

@@ -36,7 +36,7 @@ namespace PollyMVVM
             containerRegistry.Register<INetworkService, NetworkService>();
             containerRegistry.Register<IApiService, ApiService>();
             containerRegistry.Register<IClient, Client>();
-            containerRegistry.Register<IStatesService, StatesService>();
+            containerRegistry.Register<ICountriesService, CountriesService>();
         }
     }
 }

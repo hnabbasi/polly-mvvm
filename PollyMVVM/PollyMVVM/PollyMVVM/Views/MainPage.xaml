@@ -16,15 +16,15 @@
         </Grid.RowDefinitions>
 
         <StackLayout>
-            <Button Text="Load States" Command="{Binding LoadStatesCommand}"/>
-            <Button Text="Load States Retry" Command="{Binding LoadStatesRetryCommand}" CommandParameter="false"/>
-            <Button Text="Load States WaitAndRetry" Command="{Binding LoadStatesRetryCommand}" CommandParameter="true"/>
+            <Button Text="Load Countries" Command="{Binding LoadCountriesCommand}"/>
+            <Button Text="Load Countries Retry" Command="{Binding LoadCountriesRetryCommand}" CommandParameter="false"/>
+            <Button Text="Load Countries WaitAndRetry" Command="{Binding LoadCountriesRetryCommand}" CommandParameter="true"/>
         </StackLayout>
         
-        <ListView Grid.Row="1" ItemsSource="{Binding States}">
+        <ListView Grid.Row="1" ItemsSource="{Binding Countries}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextCell Text="{Binding StateName}"/>
+                    <TextCell Text="{Binding Name}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

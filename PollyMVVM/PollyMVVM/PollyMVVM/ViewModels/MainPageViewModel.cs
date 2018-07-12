@@ -3,7 +3,6 @@ using Prism.Commands;
 using Prism.Navigation;
 using Prism.Services;
 using PollyMVVM.Models;
-using System.Collections.ObjectModel;
 using System;
 using System.Threading.Tasks;
 
@@ -11,77 +10,79 @@ namespace PollyMVVM.ViewModels
 {
     public class MainPageViewModel : ViewModelBase
     {
-        readonly IStatesService _statesService;
+        readonly ICountriesService _countriesService;
         private readonly IPageDialogService _pageDialogService;
 
-        public MainPageViewModel(INavigationService navigationService, IStatesService statesService, IPageDialogService pageDialogService)
+        public MainPageViewModel(INavigationService navigationService, ICountriesService countriesService, IPageDialogService pageDialogService)
             : base(navigationService)
         {
-            Title = "States";
-            _statesService = statesService;
+            Title = "Countries";
+            _countriesService = countriesService;
             _pageDialogService = pageDialogService;
             InitializeCommands();
         }
 
-        public DelegateCommand LoadStatesCommand { get; private set; }
-        public DelegateCommand<object> LoadStatesRetryCommand { get; private set; }
+        public DelegateCommand LoadCountriesCommand { get; private set; }
+        public DelegateCommand<object> LoadCountriesRetryCommand { get; private set; }
         public DelegateCommand ClearCommand { get; private set; }
-        
-        ObservableCollection<State> _states;
-        public ObservableCollection<State> States
+
+        Country[] _countries;
+        public Country[] Countries
         {
-            get { return _states; }
-            set { SetProperty(ref _states, value); }
+            get { return _countries; }
+            set { SetProperty(ref _countries, value); }
         }
 
         void InitializeCommands()
         {
-            LoadStatesCommand = new DelegateCommand(OnLoadStatesTapped);
-            LoadStatesRetryCommand = new DelegateCommand<object>(OnLoadStatesRetryTapped);
+            LoadCountriesCommand = new DelegateCommand(OnLoadCountriesTapped);
+            LoadCountriesRetryCommand = new DelegateCommand<object>(OnLoadCountriesRetryTapped);
             ClearCommand = new DelegateCommand(OnClearTapped);
         }
 
         void OnClearTapped()
         {
-            States = null;
+            Countries = null;
         }
 
-        async void OnLoadStatesTapped()
+        async void OnLoadCountriesTapped()
         {
             ShowLoading();
-            await LoadStates();
+            await LoadCountries();
             DismissLoading();
         }
 
-        async void OnLoadStatesRetryTapped(object shouldWaitAndRetry)
+        async void OnLoadCountriesRetryTapped(object shouldWaitAndRetry)
         {
             ShowLoading();
-            await LoadStatesWithRetry(shouldWaitAndRetry.ToString() == "true");
+            await LoadCountriesWithRetry(shouldWaitAndRetry.ToString() == "true");
             DismissLoading();
         }
 
-        async Task LoadStates()
+        async Task LoadCountries()
         {
             try
             {
-                States = new ObservableCollection<State>(await _statesService.GetStates());
+                Countries = await _countriesService.GetCountries();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ShowAlert("Could Not Load States. Try again later.");
+                Console.WriteLine(e.Message);
+                ShowAlert("Could Not Load Countries. Try again later.");
             }
         }
 
-        async Task LoadStatesWithRetry(bool shouldWaitAndRetry)
+        async Task LoadCountriesWithRetry(bool shouldWaitAndRetry)
         {
             try
             {
-                var getStatesTask = shouldWaitAndRetry ? _statesService.GetStatesWithWaitAndRetry() : _statesService.GetStatesWithRetry();
-                States = new ObservableCollection<State>(await getStatesTask);
+                var getStatesTask = shouldWaitAndRetry ? _countriesService.GetCountriesWithWaitAndRetry() : _countriesService.GetCountriesWithRetry();
+                Countries = await getStatesTask;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ShowAlert("Could Not Load States. Try again later.");
+                Console.WriteLine(e.Message);
+                ShowAlert("Could Not Load Countries. Try again later.");
             }
         }
 

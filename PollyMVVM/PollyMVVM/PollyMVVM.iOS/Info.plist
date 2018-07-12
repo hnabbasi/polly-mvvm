@@ -32,9 +32,9 @@
 	<string>LaunchScreen</string>
 	<key>CFBundleName</key>
 	<string>Polly MVVM</string>
-	<key>XSAppIconAssets</key>
-	<string>Assets.xcassets/AppIcon.appiconset</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1</string>
+	<key>XSAppIconAssets</key>
+	<string>Assets.xcassets/AppIcon.appiconset</string>
 </dict>
 </plist>
