@@ -5,20 +5,26 @@ using Prism.Services;
 using PollyMVVM.Models;
 using System;
 using System.Threading.Tasks;
+using Prism.Events;
 
 namespace PollyMVVM.ViewModels
 {
     public class MainPageViewModel : ViewModelBase
     {
         readonly ICountriesService _countriesService;
-        private readonly IPageDialogService _pageDialogService;
+        readonly IPageDialogService _pageDialogService;
+        readonly IEventAggregator _eventAggregator;
 
-        public MainPageViewModel(INavigationService navigationService, ICountriesService countriesService, IPageDialogService pageDialogService)
+        public MainPageViewModel(INavigationService navigationService, ICountriesService countriesService, IPageDialogService pageDialogService,
+                                 IEventAggregator eventAggregator)
             : base(navigationService)
         {
             Title = "Countries";
             _countriesService = countriesService;
             _pageDialogService = pageDialogService;
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.GetEvent<WaitRetryEvent>().Subscribe(OnRetrying);
             InitializeCommands();
         }
 
@@ -43,6 +49,15 @@ namespace PollyMVVM.ViewModels
         void OnClearTapped()
         {
             Countries = null;
+        }
+
+        void OnRetrying(int retryCount)
+        {
+            // if retrying for the second time, let the user know politely
+            if (retryCount > 1)
+            {
+                LoadingText = "Still loading...";
+            }
         }
 
         async void OnLoadCountriesTapped()
@@ -76,8 +91,7 @@ namespace PollyMVVM.ViewModels
         {
             try
             {
-                var getStatesTask = shouldWaitAndRetry ? _countriesService.GetCountriesWithWaitAndRetry() : _countriesService.GetCountriesWithRetry();
-                Countries = await getStatesTask;
+                Countries = shouldWaitAndRetry ? await _countriesService.GetCountriesWithWaitAndRetry() : await _countriesService.GetCountriesWithRetry();
             }
             catch (Exception e)
             {

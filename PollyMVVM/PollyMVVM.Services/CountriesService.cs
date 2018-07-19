@@ -3,31 +3,33 @@ using System.Threading.Tasks;
 using PollyMVVM.Common;
 using PollyMVVM.Models;
 using PollyMVVM.Services.Abstractions;
+using Prism.Events;
 
 namespace PollyMVVM.Services
 {
     public class CountriesService : ICountriesService
     {
         readonly IApiService _apiService;
+        readonly IEventAggregator _eventAggregator;
         int DEFAULT_COUNT = 3;
+        Uri HOST = new Uri(AppConstants.ApiCountriesUrl);
 
-        public CountriesService(IApiService apiService)
+        public CountriesService(IApiService apiService, IEventAggregator eventAggregator)
         {
             _apiService = apiService;
+            _eventAggregator = eventAggregator;
         }
 
         public async Task<Country[]> GetCountries(){
             var response = await _apiService.GetAsync<CountriesResponse>(new Uri(AppConstants.ApiCountriesUrl));
-            var results = response.Countries;
-            return results;
+            return response?.Countries;
         }
 
         #region Retry
         public async Task<Country[]> GetCountriesWithRetry()
         {
-            var host = new Uri(AppConstants.ApiCountriesUrl);
-            var response = await _apiService.GetAndRetry<CountriesResponse>(host, DEFAULT_COUNT, OnRetry);
-            return response.Countries;
+            var response = await _apiService.GetAndRetry<CountriesResponse>(HOST, DEFAULT_COUNT, OnRetry);
+            return response?.Countries;
         }
 
         Task OnRetry(Exception e, int retryCount)
@@ -41,15 +43,16 @@ namespace PollyMVVM.Services
         #region WaitAndRetry
         public async Task<Country[]> GetCountriesWithWaitAndRetry()
         {
-            var host = new Uri(AppConstants.ApiCountriesUrl);
+            var response = await _apiService.GetAndRetry<CountriesResponse>(HOST, GetSleepDuration, DEFAULT_COUNT, OnWaitAndRetry);
 
-            var response = await _apiService.GetAndRetry<CountriesResponse>(host, GetSleepDuration, DEFAULT_COUNT, OnWaitAndRetry);
-
-            return response.Countries;
+            return response?.Countries;
         }
 
         TimeSpan GetSleepDuration(int retryCount)
         {
+            // Let anyone listening know that we are about to retry.
+            _eventAggregator.GetEvent<WaitRetryEvent>().Publish(retryCount);
+
             return TimeSpan.FromSeconds(retryCount * 3);
         }
 
